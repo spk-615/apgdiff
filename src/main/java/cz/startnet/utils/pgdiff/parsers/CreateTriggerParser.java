@@ -26,14 +26,20 @@ public class CreateTriggerParser {
     public static void parse(final PgDatabase database,
             final String statement, final boolean ignoreSlonyTriggers) {
         final Parser parser = new Parser(statement);
-        parser.expect("CREATE", "TRIGGER");
+        boolean constraint = false;
+        parser.expect("CREATE");
+        if (parser.expectOptional("CONSTRAINT")){
+        	constraint = true;
+        };
+        parser.expect("TRIGGER");
 
         final String triggerName = parser.parseIdentifier();
         final String objectName = ParserUtils.getObjectName(triggerName);
 
         final PgTrigger trigger = new PgTrigger();
+        trigger.setConstraint(constraint);
+        
         trigger.setName(objectName);
-
         if (parser.expectOptional("BEFORE")) {
             trigger.setEventTimeQualification(PgTrigger.EventTimeQualification.before);
         } else if (parser.expectOptional("AFTER")) {
@@ -85,6 +91,21 @@ public class CreateTriggerParser {
                
             } 
         }
+        
+        if (trigger.isConstraint()) {
+        	if (parser.expectOptional("DEFERRABLE")) {
+        		trigger.setDeferrable(true);
+        		if (parser.expectOptional("INITIALLY DEFERRED")){
+        			trigger.setDeferred(PgTrigger.ExecutionTimeQualification.deferred);
+        		} else if (parser.expectOptional("INITIALLY IMMEDIATE")) {
+					trigger.setDeferred(PgTrigger.ExecutionTimeQualification.immediate);
+				}
+        			
+        	}
+        }
+        
+        
+        
 
         if (parser.expectOptional("FOR")) {
             parser.expectOptional("EACH");

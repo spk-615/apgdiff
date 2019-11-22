@@ -115,7 +115,7 @@ public class PgDumpLoader { //NOPMD
      * Pattern for testing whether it is CREATE TRIGGER statement.
      */
     private static final Pattern PATTERN_CREATE_TRIGGER = Pattern.compile(
-            "^CREATE[\\s]+TRIGGER[\\s]+.*$",
+            "^CREATE[\\s]+(CONSTRAINT[\\s]+)?TRIGGER[\\s]+.*$",
             Pattern.CASE_INSENSITIVE | Pattern.DOTALL);
     /**
      * Pattern for testing whether it is CREATE FUNCTION or CREATE OR REPLACE

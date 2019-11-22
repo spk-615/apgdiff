@@ -19,7 +19,26 @@ import java.util.Map;
  */
 public class PgTrigger {
 
-    /**
+    public enum ExecutionTimeQualification {
+		deferred,
+		immediate;
+		
+		private static final Map<ExecutionTimeQualification, String> stringRepresentation;
+		
+		static {
+			HashMap<ExecutionTimeQualification, String> aMap = new HashMap<ExecutionTimeQualification, String>();
+			aMap.put(ExecutionTimeQualification.deferred, "INITIALLY DEFERRED");
+			aMap.put(ExecutionTimeQualification.immediate, "INITALLY IMMEDIATE");
+			
+			stringRepresentation = aMap;
+		}
+		
+		public static String toString(ExecutionTimeQualification executionTimeQualification) {
+			return stringRepresentation.get(executionTimeQualification);
+		}
+	}
+
+	/**
      * Enumeration of when, with respect to event, a trigger should fire.
      * e.g. BEFORE, AFTER or INSTEAD OF an event.
      */
@@ -44,6 +63,18 @@ public class PgTrigger {
         }
     }
 
+    /**
+     * Whether the trigger is a CONSTRAINT trigger
+     */
+    private boolean constraint = false;
+    /**
+     * Whether the trigger is DEFERRABLE
+     */
+    private boolean deferrable = false;
+    /**
+     * Execution time
+     */
+    private ExecutionTimeQualification deferred;
     /**
      * Function name and arguments that should be fired on the trigger.
      */
@@ -140,14 +171,72 @@ public class PgTrigger {
         this.comment = comment;
     }
 
-    /**
+    /** 
+     * Getter for {@link #constraint}.
+     *     
+     * @param constraint {@link #constraint}
+     */
+    public boolean isConstraint() {
+		return constraint;
+	}
+    
+    /** 
+     * Setter for {@link #constraint}.
+     *     
+     * @param constraint {@link #constraint}
+     */
+    public void setConstraint(boolean constraint) {
+		this.constraint = constraint;
+	}
+    
+    /** 
+     * Getter for {@link #deferrable}.
+     *     
+     * @param deferrable {@link #deferrable}
+     */
+    public boolean isDeferrable() {
+		return deferrable;
+	}
+
+    /** 
+     * Setter for {@link #deferrable}.
+     *     
+     * @param deferrable {@link #deferrable}
+     */
+    public void setDeferrable(boolean deferrable) {
+		this.deferrable = deferrable;
+	}
+
+    /** 
+     * Getter for {@link #deferred}.
+     *     
+     * @param deferred {@link #deferred}
+     */
+    public ExecutionTimeQualification deferred() {
+		return deferred;
+	}
+
+    /** 
+     * SGetter for {@link #deferred}.
+     *     
+     * @param deferred {@link #deferred}
+     */
+    public void setDeferred(final ExecutionTimeQualification deferred) {
+		this.deferred = deferred;
+	}
+
+	/**
      * Creates and returns SQL for creation of trigger.
      *
      * @return created SQL
      */
     public String getCreationSQL() {
         final StringBuilder sbSQL = new StringBuilder(100);
-        sbSQL.append("CREATE TRIGGER ");        
+        if (constraint) {
+        	sbSQL.append("CREATE CONSTRAINT TRIGGER ");
+        } else {
+        	sbSQL.append("CREATE TRIGGER ");
+        }
         sbSQL.append(PgDiffUtils.getQuotedName(getName()));
         sbSQL.append(System.getProperty("line.separator"));
         sbSQL.append("\t");
@@ -210,6 +299,14 @@ public class PgTrigger {
         if(referencing!=null && !referencing.isEmpty()){
             sbSQL.append(getReferencing());
             sbSQL.append(System.getProperty("line.separator"));
+        }
+        
+        if(constraint && deferrable) {
+        	sbSQL.append("DEFERRABLE ");
+        	sbSQL.append(ExecutionTimeQualification.toString(deferred));
+        	sbSQL.append(System.getProperty("line.separator"));
+            
+        	
         }
         
         sbSQL.append("\tFOR EACH ");
