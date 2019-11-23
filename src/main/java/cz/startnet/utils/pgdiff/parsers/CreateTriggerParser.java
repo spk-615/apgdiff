@@ -82,16 +82,6 @@ public class CreateTriggerParser {
 
         trigger.setRelationName(ParserUtils.getObjectName(relationName));
         
-        String referencing="REFERENCING";
-        if (parser.expectOptional(referencing)) {            
-             trigger.setReferencing("\t"+referencing);             
-
-            while( !parser.getSubString(parser.getPosition()-5, parser.getPosition()-4).equals(System.getProperty("line.separator"))){ 
-                parseReferencing(parser,trigger);
-               
-            } 
-        }
-        
         if (trigger.isConstraint()) {
         	if (parser.expectOptional("DEFERRABLE")) {
         		trigger.setDeferrable(true);
@@ -104,9 +94,17 @@ public class CreateTriggerParser {
         	}
         }
         
-        
-        
+        String referencing="REFERENCING";
+        if (parser.expectOptional(referencing)) {            
+             trigger.setReferencing("\t"+referencing);             
 
+            while(!System.lineSeparator().contains(parser.getSubString(parser.getPosition()-5, parser.getPosition()-4))) {
+                parseReferencing(parser,trigger);
+            } 
+        }
+        
+        
+        
         if (parser.expectOptional("FOR")) {
             parser.expectOptional("EACH");
 

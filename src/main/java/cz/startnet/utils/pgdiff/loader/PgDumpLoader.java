@@ -279,7 +279,6 @@ public class PgDumpLoader { //NOPMD
                 // these statements are ignored if outputIgnoredStatements
                 // is false
             }
-
             statement = getWholeStatement(reader);
         }
 

@@ -27,8 +27,8 @@ public class PgTrigger {
 		
 		static {
 			HashMap<ExecutionTimeQualification, String> aMap = new HashMap<ExecutionTimeQualification, String>();
-			aMap.put(ExecutionTimeQualification.deferred, "INITIALLY DEFERRED");
-			aMap.put(ExecutionTimeQualification.immediate, "INITALLY IMMEDIATE");
+			aMap.put(ExecutionTimeQualification.deferred, "INITIALLY DEFERRED ");
+			aMap.put(ExecutionTimeQualification.immediate, "INITALLY IMMEDIATE ");
 			
 			stringRepresentation = aMap;
 		}
@@ -174,7 +174,7 @@ public class PgTrigger {
     /** 
      * Getter for {@link #constraint}.
      *     
-     * @param constraint {@link #constraint}
+     * @return {@link #constraint}
      */
     public boolean isConstraint() {
 		return constraint;
@@ -192,7 +192,7 @@ public class PgTrigger {
     /** 
      * Getter for {@link #deferrable}.
      *     
-     * @param deferrable {@link #deferrable}
+     * @return {@link #deferrable}
      */
     public boolean isDeferrable() {
 		return deferrable;
@@ -210,14 +210,14 @@ public class PgTrigger {
     /** 
      * Getter for {@link #deferred}.
      *     
-     * @param deferred {@link #deferred}
+     * @return {@link #deferred}
      */
     public ExecutionTimeQualification deferred() {
 		return deferred;
 	}
 
     /** 
-     * SGetter for {@link #deferred}.
+     * Setter for {@link #deferred}.
      *     
      * @param deferred {@link #deferred}
      */
